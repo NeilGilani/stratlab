@@ -4,7 +4,7 @@
 
 Type a strategy in plain English — *"buy the dip"*, *"momentum"*, *"golden cross"* — or write it in **StratLang**, and watch it backtest on historical data **live, in your browser**. No account, no code, no setup, no backend. Just an idea in, an equity curve out.
 
-👉 **[Try the live demo](https://hilothefunnydog123-coder.github.io/stratlab/)**
+👉 **[Try the live demo](https://neilgilani.github.io/stratlab/)**
 
 ![StratLab](docs/screenshot.png)
 
@@ -19,7 +19,7 @@ The wedge is the **readable language**: a strategy is `when sma(20) > sma(100) t
 ## What it does
 
 - **Plain-English → strategy.** Describe an idea; StratLab generates editable StratLang.
-- **Instant in-browser backtest.** A hand-written parser + a **no-lookahead** backtesting engine (the same design as [quantlang](https://github.com/hilothefunnydog123-coder/quantlang) and [quantsim](https://github.com/hilothefunnydog123-coder/quantsim)), ported to pure JavaScript — runs entirely client-side.
+- **Instant in-browser backtest.** A hand-written parser + a **no-lookahead** backtesting engine (the same design as [quantlang](https://github.com/NeilGilani/quantlang) and [quantsim](https://github.com/NeilGilani/quantsim)), ported to pure JavaScript — runs entirely client-side.
 - **Honest results.** Transaction costs are on, buy & hold is always the benchmark, and the engine never peeks at the future. If your idea loses, StratLab tells you — that's the point.
 - **Real diagnostics.** Compile errors point at the line with *did-you-mean* suggestions.
 
@@ -38,7 +38,7 @@ Rules read top-down, first match wins, `otherwise` is required. Actions are `lon
 It's a static site — no build, no server:
 
 ```bash
-git clone https://github.com/hilothefunnydog123-coder/stratlab.git
+git clone https://github.com/NeilGilani/stratlab.git
 cd stratlab && python3 -m http.server   # open http://localhost:8000
 ```
 
@@ -50,20 +50,20 @@ Deploy anywhere static (GitHub Pages, Vercel, Netlify) by pointing it at the rep
 |---|---|---|
 | Lexer + recursive-descent parser | `engine.js` | Real operator precedence, position-tracked errors |
 | No-lookahead backtester | `engine.js` | Weight from data through *t* earns return *t→t+1*; turnover costs |
-| Plain-English translator | `translate.js` | Deterministic intent matcher — **an LLM slots in here in production** (one function) |
+| Plain-English translator | `translate.js` · `model.js` | A small bag-of-words neural net, trained in [`ml/train.py`](ml/train.py) with NumPy and hand-written backprop, that maps a sentence to one of 8 strategy templates. It only knows those 8 ideas; anything else gets the nearest one. |
 | UI + canvas chart | `app.js` | Zero dependencies |
 
 ## Roadmap
 
-- [ ] Real market data (swap the sample series for a data API)
+- [x] Real market data: daily closes for SPY, QQQ, AAPL, MSFT, NVDA and TSLA, refreshed on weekdays by [a GitHub Action](.github/workflows/data.yml)
 - [ ] LLM-powered translation for open-ended descriptions
-- [ ] Options mode — IV rank, expected move & Greeks from [optionslab](https://github.com/hilothefunnydog123-coder/optionslab)
+- [ ] Options mode — IV rank, expected move & Greeks from [optionslab](https://github.com/NeilGilani/optionslab)
 - [ ] Save & share a strategy by URL
-- [ ] One-click paper-trade (via [quantsim](https://github.com/hilothefunnydog123-coder/quantsim) live)
+- [ ] One-click paper-trade (via [quantsim](https://github.com/NeilGilani/quantsim) live)
 
 ## A note on scope
 
-StratLab is a **research and learning tool**. It runs on sample data and never offers real-money trading — deliberately. The moment a product custodies user funds it inherits a mountain of regulation; StratLab stays on the education/simulation side of that line on purpose.
+StratLab is a **research and learning tool**. It runs on real daily closes (yfinance, refreshed on weekdays) and never offers real-money trading — deliberately. The moment a product custodies user funds it inherits a mountain of regulation; StratLab stays on the education/simulation side of that line on purpose.
 
 ## License
 
